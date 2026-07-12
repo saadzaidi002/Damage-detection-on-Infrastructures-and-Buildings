@@ -1,21 +1,9 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
 import gradio as gr
 import spaces
 import joblib
 import pandas as pd
 import os
-
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+import json
 
 # Load models
 MODELS = {}
@@ -84,19 +72,18 @@ EXPLANATIONS = {
     }
 }
 
-@app.post('/predict')
-async def predict_api(request: Request):
+@spaces.GPU
+def predict(structure_type, materials_json_str, inundation_depth):
     try:
-        data = await request.json()
-        structure_type = data.get('structure_type', '').lower()
-        materials = data.get('materials', []) 
-        inundation_depth = float(data.get('inundation_depth', 0.0))
+        structure_type = str(structure_type).lower()
+        materials = json.loads(materials_json_str)
+        inundation_depth = float(inundation_depth)
         
         if structure_type not in ['building', 'infrastructure']:
-            return JSONResponse(status_code=400, content={'error': 'Invalid structure_type. Must be building or infrastructure.'})
+            return json.dumps({'error': 'Invalid structure_type. Must be building or infrastructure.'})
             
         if not materials:
-            return JSONResponse(status_code=400, content={'error': 'Please select at least one material.'})
+            return json.dumps({'error': 'Please select at least one material.'})
             
         worst_result = None
         max_grade = -1
@@ -137,17 +124,16 @@ async def predict_api(request: Request):
                     'is_composite': len(materials) > 1
                 }
                 
-        return worst_result
+        return json.dumps(worst_result)
         
     except Exception as e:
-        return JSONResponse(status_code=500, content={'error': str(e)})
+        return json.dumps({'error': str(e)})
 
-# Mount a dummy Gradio app to satisfy Hugging Face Space requirements
-@spaces.GPU
-def dummy_api_status():
-    return "API is running"
+demo = gr.Interface(
+    fn=predict,
+    inputs=[gr.Textbox(), gr.Textbox(), gr.Number()],
+    outputs=gr.Textbox()
+)
 
-demo = gr.Interface(fn=dummy_api_status, inputs=None, outputs="text")
-app = gr.mount_gradio_app(app, demo, path="/")
-
-
+if __name__ == '__main__':
+    demo.launch()

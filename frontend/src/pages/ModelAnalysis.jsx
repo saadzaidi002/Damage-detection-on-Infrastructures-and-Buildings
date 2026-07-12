@@ -38,19 +38,31 @@ function ModelAnalysis() {
     setResult(null);
 
     try {
-      const response = await fetch('https://smsaad001-buildings.hf.space/predict', {
+      const response = await fetch('https://smsaad001-buildings.hf.space/run/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          data: [
+            formData.structure_type,
+            JSON.stringify(formData.materials),
+            parseFloat(formData.inundation_depth)
+          ]
+        })
       });
       
-      const data = await response.json();
+      const responseJson = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.error || 'Prediction failed');
+        throw new Error(responseJson.error || 'Prediction failed');
       }
       
-      setResult(data);
+      const resultData = JSON.parse(responseJson.data[0]);
+      
+      if (resultData.error) {
+        throw new Error(resultData.error);
+      }
+      
+      setResult(resultData);
     } catch (err) {
       setError(err.message);
     } finally {

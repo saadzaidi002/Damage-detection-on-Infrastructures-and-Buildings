@@ -85,7 +85,6 @@ EXPLANATIONS = {
 }
 
 @app.post('/predict')
-@spaces.GPU
 async def predict_api(request: Request):
     try:
         data = await request.json()
@@ -144,7 +143,11 @@ async def predict_api(request: Request):
         return JSONResponse(status_code=500, content={'error': str(e)})
 
 # Mount a dummy Gradio app to satisfy Hugging Face Space requirements
-demo = gr.Interface(fn=lambda: "API is running", inputs=None, outputs="text")
+@spaces.GPU
+def dummy_api_status():
+    return "API is running"
+
+demo = gr.Interface(fn=dummy_api_status, inputs=None, outputs="text")
 app = gr.mount_gradio_app(app, demo, path="/")
 
 if __name__ == '__main__':

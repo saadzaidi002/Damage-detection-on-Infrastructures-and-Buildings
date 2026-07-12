@@ -7,8 +7,8 @@
   --accent-amber: #D97706;
   --accent-sage: #16A34A;
   
-  --text-dark: #1E293B;
-  --text-muted: #475569; /* Darkened for better contrast */
+  --text-dark: #111827; /* True dark charcoal for high readability */
+  --text-muted: #374151; /* Darkened for better contrast */
   --border-light: #E2E8F0;
   --card-bg: #FFFFFF;
   
@@ -103,7 +103,7 @@ a {
 .nav-link {
   font-size: 1.1rem;
   font-weight: 500;
-  color: #94A3B8;
+  color: #CBD5E1; /* Soft silver/light gray for readability */
   padding: 0.5rem 0;
   position: relative;
 }
@@ -122,8 +122,8 @@ a {
   bottom: -0.75rem;
   left: 0;
   right: 0;
-  height: 2px;
-  background-color: var(--accent-teal);
+  height: 3px;
+  background-color: #00E5FF; /* Vibrant electric cyan */
   border-radius: 2px 2px 0 0;
 }
 

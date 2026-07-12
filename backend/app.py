@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import gradio as gr
+import spaces
 import joblib
 import pandas as pd
 import os
@@ -84,6 +85,7 @@ EXPLANATIONS = {
 }
 
 @app.post('/predict')
+@spaces.GPU
 async def predict_api(request: Request):
     try:
         data = await request.json()

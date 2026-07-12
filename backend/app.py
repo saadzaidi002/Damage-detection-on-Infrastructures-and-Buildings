@@ -150,6 +150,4 @@ def dummy_api_status():
 demo = gr.Interface(fn=dummy_api_status, inputs=None, outputs="text")
 app = gr.mount_gradio_app(app, demo, path="/")
 
-if __name__ == '__main__':
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+

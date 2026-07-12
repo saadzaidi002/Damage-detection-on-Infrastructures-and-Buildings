@@ -115,13 +115,15 @@ function Navbar() {
 
 function Header() {
   return (
-    <header className="main-header">
-      <div className="header-brand">
-        <img src="/bg-logo.png" alt="Logo" style={{height: '40px', width: 'auto'}} />
-        <span>Structural Damage Prediction</span>
-      </div>
-      <Navbar />
-    </header>
+    <div className="header-wrapper">
+      <header className="main-header">
+        <div className="header-brand">
+          <img src="/bg-logo.png" alt="Logo" style={{height: '40px', width: 'auto'}} />
+          <span>Structural Damage Prediction</span>
+        </div>
+        <Navbar />
+      </header>
+    </div>
   );
 }
 

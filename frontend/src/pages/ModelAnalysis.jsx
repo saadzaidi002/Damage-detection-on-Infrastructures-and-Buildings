@@ -39,7 +39,8 @@ function ModelAnalysis() {
     setResult(null);
 
     try {
-      const client = await Client.connect("smsaad001/buildings");
+      const hfToken = import.meta.env.VITE_HF_TOKEN;
+      const client = await Client.connect("smsaad001/buildings", hfToken ? { hf_token: hfToken } : {});
       const result = await client.predict("/predict", { 
         structure_type: formData.structure_type, 
         materials_json_str: JSON.stringify(formData.materials), 

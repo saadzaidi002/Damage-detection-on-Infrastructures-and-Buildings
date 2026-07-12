@@ -1,11 +1,20 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+import gradio as gr
 import joblib
 import pandas as pd
 import os
 
-app = Flask(__name__)
-CORS(app)
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Load models
 MODELS = {}
@@ -74,34 +83,31 @@ EXPLANATIONS = {
     }
 }
 
-@app.route('/predict', methods=['POST'])
-def predict():
+@app.post('/predict')
+async def predict_api(request: Request):
     try:
-        data = request.json
-        structure_type = data.get('structure_type', '').lower() # 'building' or 'infrastructure'
+        data = await request.json()
+        structure_type = data.get('structure_type', '').lower()
         materials = data.get('materials', []) 
         inundation_depth = float(data.get('inundation_depth', 0.0))
         
         if structure_type not in ['building', 'infrastructure']:
-            return jsonify({'error': 'Invalid structure_type. Must be building or infrastructure.'}), 400
+            return JSONResponse(status_code=400, content={'error': 'Invalid structure_type. Must be building or infrastructure.'})
             
         if not materials:
-            return jsonify({'error': 'Please select at least one material.'}), 400
+            return JSONResponse(status_code=400, content={'error': 'Please select at least one material.'})
             
         worst_result = None
         max_grade = -1
         
         for mat in materials:
-            # Format input for model
             input_df = pd.DataFrame([{'Inund Depth': inundation_depth, 'Material': mat}])
             
-            # 1. Master Classifier
             master_model = MODELS[f'{structure_type}_master']
             
             is_severe = master_model.predict(input_df)[0]
             master_probs = master_model.predict_proba(input_df)[0]
             
-            # 2. Specific Classifier
             if is_severe == 1:
                 specific_model = MODELS[f'{structure_type}_severe']
                 severity_group = "Severe"
@@ -113,7 +119,6 @@ def predict():
             grade_probs = specific_model.predict_proba(input_df)[0]
             confidence = float(max(grade_probs) * 100)
             
-            # Determine Explanation
             if structure_type == 'building':
                 explanation = EXPLANATIONS["Building"].get(mat, EXPLANATIONS["Building"]["Masonry"]).get(predicted_grade, "No explanation available.")
             else:
@@ -131,10 +136,15 @@ def predict():
                     'is_composite': len(materials) > 1
                 }
                 
-        return jsonify(worst_result)
+        return worst_result
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return JSONResponse(status_code=500, content={'error': str(e)})
+
+# Mount a dummy Gradio app to satisfy Hugging Face Space requirements
+demo = gr.Interface(fn=lambda: "API is running", inputs=None, outputs="text")
+app = gr.mount_gradio_app(app, demo, path="/")
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=5000)

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, CheckCircle2, ShieldAlert, Loader2 } from 'lucide-react';
+import { Client } from '@gradio/client';
 
 function ModelAnalysis() {
   const [formData, setFormData] = useState({
@@ -38,25 +39,14 @@ function ModelAnalysis() {
     setResult(null);
 
     try {
-      const response = await fetch('https://smsaad001-buildings.hf.space/run/predict', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          data: [
-            formData.structure_type,
-            JSON.stringify(formData.materials),
-            parseFloat(formData.inundation_depth)
-          ]
-        })
+      const client = await Client.connect("smsaad001/buildings");
+      const result = await client.predict("/predict", { 
+        structure_type: formData.structure_type, 
+        materials_json_str: JSON.stringify(formData.materials), 
+        inundation_depth: parseFloat(formData.inundation_depth) 
       });
       
-      const responseJson = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(responseJson.error || 'Prediction failed');
-      }
-      
-      const resultData = JSON.parse(responseJson.data[0]);
+      const resultData = JSON.parse(result.data[0]);
       
       if (resultData.error) {
         throw new Error(resultData.error);

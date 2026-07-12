@@ -162,7 +162,7 @@ h3 {
   border: 1px solid var(--border-light);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(0, 0, 0, 0.04);
   margin-bottom: 2rem;
-  transition: all 0.2s ease-in-out;
+  transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
 }
 
 /* Forms & Inputs */
@@ -461,8 +461,8 @@ h3 {
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: transform 0.15s ease-out, width 0.2s, height 0.2s, background-color 0.2s;
+  transform: translate3d(-50%, -50%, 0);
+  transition: width 0.2s, height 0.2s, background-color 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -512,7 +512,6 @@ h3 {
 }
 
 .card:hover {
-  transform: translateY(-4px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
   border-color: #CBD5E1;
 }

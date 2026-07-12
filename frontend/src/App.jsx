@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import Overview from './pages/Overview';
 import ModelAnalysis from './pages/ModelAnalysis';
@@ -6,53 +6,67 @@ import About from './pages/About';
 import { Home, Activity, User } from 'lucide-react';
 
 function CustomCursor() {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [hovering, setHovering] = useState(false);
+  const cursorRef = useRef(null);
 
   useEffect(() => {
+    let animationFrameId;
+
     const updatePosition = (e) => {
-      setPosition({ x: e.clientX, y: e.clientY });
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
       
-      // Update spotlight effect on cards
-      document.querySelectorAll('.card').forEach((card) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const w = rect.width;
-        const h = rect.height;
+      animationFrameId = requestAnimationFrame(() => {
+        if (cursorRef.current) {
+          cursorRef.current.style.transform = `translate3d(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%), 0)`;
+        }
         
-        const maxDist = 350;
-        
-        const setCornerOpacity = (cornerX, cornerY, prefix) => {
-          const dx = x - cornerX;
-          const dy = y - cornerY;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+        // Update spotlight effect on cards
+        document.querySelectorAll('.card').forEach((card) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const w = rect.width;
+          const h = rect.height;
           
-          let op1 = 0;
-          let op2 = 0;
+          const maxDist = 350;
           
-          if (dist < maxDist) {
-            const intensity = 1 - (dist / maxDist);
-            // Non-linear easing for smoother fade
-            const smoothIntensity = intensity * intensity;
-            op1 = 0.5 * smoothIntensity;
-            op2 = 0.3 * smoothIntensity;
+          // Performance optimization: skip calculating if mouse is far away
+          if (x < -maxDist || x > w + maxDist || y < -maxDist || y > h + maxDist) {
+            ['tl', 'tr', 'bl', 'br'].forEach(prefix => {
+              card.style.setProperty(`--${prefix}-1`, '0');
+              card.style.setProperty(`--${prefix}-2`, '0');
+            });
+            return;
           }
           
-          card.style.setProperty(`--${prefix}-1`, op1.toFixed(3));
-          card.style.setProperty(`--${prefix}-2`, op2.toFixed(3));
-        };
+          const setCornerOpacity = (cornerX, cornerY, prefix) => {
+            const dx = x - cornerX;
+            const dy = y - cornerY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            let op1 = 0;
+            let op2 = 0;
+            
+            if (dist < maxDist) {
+              const intensity = 1 - (dist / maxDist);
+              const smoothIntensity = intensity * intensity;
+              op1 = 0.5 * smoothIntensity;
+              op2 = 0.3 * smoothIntensity;
+            }
+            
+            card.style.setProperty(`--${prefix}-1`, op1.toFixed(3));
+            card.style.setProperty(`--${prefix}-2`, op2.toFixed(3));
+          };
 
-        setCornerOpacity(0, 0, 'tl');
-        setCornerOpacity(w, 0, 'tr');
-        setCornerOpacity(0, h, 'bl');
-        setCornerOpacity(w, h, 'br');
+          setCornerOpacity(0, 0, 'tl');
+          setCornerOpacity(w, 0, 'tr');
+          setCornerOpacity(0, h, 'bl');
+          setCornerOpacity(w, h, 'br');
+        });
       });
     };
     
     const handleMouseOver = (e) => {
       const target = e.target;
-      // Check if hovering over interactive elements
       if (
         target.tagName.toLowerCase() === 'a' ||
         target.tagName.toLowerCase() === 'button' ||
@@ -62,30 +76,23 @@ function CustomCursor() {
         target.closest('button') ||
         target.closest('.card')
       ) {
-        setHovering(true);
+        if (cursorRef.current) cursorRef.current.classList.add('hovering');
       } else {
-        setHovering(false);
+        if (cursorRef.current) cursorRef.current.classList.remove('hovering');
       }
     };
 
-    window.addEventListener('mousemove', updatePosition);
-    window.addEventListener('mouseover', handleMouseOver);
+    window.addEventListener('mousemove', updatePosition, { passive: true });
+    window.addEventListener('mouseover', handleMouseOver, { passive: true });
 
     return () => {
       window.removeEventListener('mousemove', updatePosition);
       window.removeEventListener('mouseover', handleMouseOver);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
-  return (
-    <div 
-      className={`custom-cursor ${hovering ? 'hovering' : ''}`}
-      style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`
-      }}
-    />
-  );
+  return <div ref={cursorRef} className="custom-cursor" />;
 }
 
 function Navbar() {

@@ -1,7 +1,6 @@
 fastapi
 uvicorn
 gradio
-spaces
 scikit-learn
 pandas
 numpy

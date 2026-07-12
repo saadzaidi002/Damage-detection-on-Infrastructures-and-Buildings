@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Linkedin, Instagram, Facebook } from 'lucide-react';
+import { FaLinkedin, FaInstagram, FaFacebook } from 'react-icons/fa';
 
 function About() {
   return (
@@ -25,14 +25,14 @@ function About() {
             </div>
             
             <div style={{marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem'}}>
-              <a href="https://www.linkedin.com/in/s-m-saad-a9a238299/" target="_blank" rel="noopener noreferrer" style={{padding: '0.75rem', backgroundColor: '#F8FAFC', color: '#0A66C2', borderRadius: '50%', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'}}>
-                <Linkedin size={24} />
+              <a href="https://www.linkedin.com/in/s-m-saad-a9a238299/" target="_blank" rel="noopener noreferrer" className="social-icon linkedin">
+                <FaLinkedin size={22} />
               </a>
-              <a href="https://www.instagram.com/s.m.saad002/?hl=en" target="_blank" rel="noopener noreferrer" style={{padding: '0.75rem', backgroundColor: '#F8FAFC', color: '#E4405F', borderRadius: '50%', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'}}>
-                <Instagram size={24} />
+              <a href="https://www.instagram.com/s.m.saad002/?hl=en" target="_blank" rel="noopener noreferrer" className="social-icon instagram">
+                <FaInstagram size={22} />
               </a>
-              <a href="https://www.facebook.com/syed.saad.856366" target="_blank" rel="noopener noreferrer" style={{padding: '0.75rem', backgroundColor: '#F8FAFC', color: '#1877F2', borderRadius: '50%', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'}}>
-                <Facebook size={24} />
+              <a href="https://www.facebook.com/syed.saad.856366" target="_blank" rel="noopener noreferrer" className="social-icon facebook">
+                <FaFacebook size={22} />
               </a>
             </div>
           </motion.div>

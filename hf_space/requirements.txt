@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+gradio
+spaces
+scikit-learn
+pandas
+numpy
+joblib
+openpyxl
+gunicorn

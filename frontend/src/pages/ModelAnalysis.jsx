@@ -54,7 +54,8 @@ function ModelAnalysis() {
       
       setResult(resultData);
     } catch (err) {
-      setError(err.message);
+      console.error("Prediction Error:", err);
+      setError(err.message || JSON.stringify(err));
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,4 @@
 import gradio as gr
-import spaces
 import joblib
 import pandas as pd
 import os
@@ -72,7 +71,6 @@ EXPLANATIONS = {
     }
 }
 
-@spaces.GPU
 def predict(structure_type, materials_json_str, inundation_depth):
     try:
         structure_type = str(structure_type).lower()

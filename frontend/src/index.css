@@ -81,7 +81,7 @@ a {
 .navbar {
   display: flex;
   align-items: center;
-  padding: 1rem 2.5rem;
+  padding: 1rem 4.5rem;
   background-color: var(--primary-navy);
   color: white;
   border-radius: 9999px;
@@ -91,7 +91,7 @@ a {
 
 .nav-links {
   display: flex;
-  gap: 2rem;
+  gap: 4rem;
 }
 
 .nav-link {
